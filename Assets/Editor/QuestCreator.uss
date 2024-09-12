@@ -6,7 +6,32 @@ GroupBox {
 	border-color: grey;
 }
 
-.headerText {
+Foldout {
+	height: auto;
+	flex-grow: 1;
+	border-width: 1px;
+	border-radius: 5px;
+	border-color: grey;
+	background-color: #444;
+	margin-bottom: 3px;
+}
+
+.header1 {
 	-unity-font-style: bold;
 	font-size:16px;
+}
+
+.header2 {
+	-unity-font-style: bold;
+	font-size:14px;
+}
+
+.header3 {
+	-unity-font-style: bold;
+	font-size:13px;
+}
+
+#loadPanel{
+	flex-grow: 1;
+	flex-shrink: 1
 }

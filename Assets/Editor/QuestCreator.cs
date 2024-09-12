@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -45,7 +46,7 @@ public class QuestCreator : EditorWindow
 		TwoPaneSplitView splitView = new(0, 300, TwoPaneSplitViewOrientation.Horizontal);
 		root.Add(splitView);
 		VisualElement leftPane = new();
-		VisualElement rightPane = new() { name = "editPanel" };
+		ScrollView rightPane = new() { name = "editPanel" };
 		splitView.Add(leftPane);
 		splitView.Add(rightPane);
 
@@ -65,7 +66,7 @@ public class QuestCreator : EditorWindow
 		GroupBox createPanel = new();
 
 		Label header = new("Create a Quest");
-		header.AddToClassList("headerText");
+		header.AddToClassList("header1");
 
 		TextField idEntry = new("Quest ID") { name = "createQuestID" };
 
@@ -83,17 +84,19 @@ public class QuestCreator : EditorWindow
 
 	private void InstantiateLoadPanel(VisualElement parent)
 	{
-		GroupBox loadPanel = new();
+		GroupBox loadPanel = new() { name = "loadPanel" };
 
 		Label header = new("Load a Quest");
-		header.AddToClassList("headerText");
+		header.AddToClassList("header1");
 
-		ListView questListDisplay = new() { name = "questListDisplay" };
-
-		// Template for each item in the list
-		questListDisplay.makeItem = MakeLoadQuestEntry;
-		questListDisplay.bindItem = BindLoadQuestEntry;
-		questListDisplay.itemsSource = questData.quests;
+		ListView questListDisplay = new()
+		{
+			name = "questListDisplay",      
+			// Template for each item in the list
+			makeItem = InstantiateLoadQuestEntry,
+			bindItem = BindLoadQuestEntry,
+			itemsSource = questData.quests
+		};
 
 		questListDisplay.selectionChanged += OnSelectNewQuest;
 
@@ -107,12 +110,12 @@ public class QuestCreator : EditorWindow
 		// Generate Fields
 		VisualElement root = rootVisualElement.Q("editPanel");
 		root.Clear();
+		
 		GroupBox questBox = new();
-
 		root.Add(questBox);
 
 		Label questInfoHeader = new($"Editing Quest: {quest.id}") { name = "questEditHeader" };
-		questInfoHeader.AddToClassList("headerText");
+		questInfoHeader.AddToClassList("header1");
 
 		TextField questID = new("ID") { name = "questID" };
 		TextField questTitle = new("Title") { name = "questTitle" };
@@ -121,59 +124,49 @@ public class QuestCreator : EditorWindow
 			name = "questDescription",
 			multiline = true
 		};
+
 		questBox.Add(questInfoHeader);
 		questBox.Add(questID);
 		questBox.Add(questTitle);
 		questBox.Add(questDescription);
 
-		var sData = CreateInstance<ScriptableQuest>();
+		GroupBox optionsBox = new();
 
-		// Loop through properties and create one field for each top level property.
-		//SerializedProperty property = serializedQuest.GetIterator();
+		Label questOptionHeader = new("Quest Options");
+		Button addQuestButton = new(AddQuestOption) { text = "Add Option" };
+		questOptionHeader.AddToClassList("header2");
 
-		//property.NextVisible(true);
-		//property.NextVisible(true);
-		//do
-		//{
-		//	Debug.Log(property.name);
-		//	// Create the UIElements PropertyField.
-		//	var uieDefaultProperty = new PropertyField(property);
+		ListView questOptions = new()
+		{
+			name = "questOptionsList",
+			makeItem = InstantiateQuestOption,
+			bindItem = BindQuestOption,
+			itemsSource = quest.options,
+			virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight
+		};
 
-		//	Debug.Log(uieDefaultProperty.hierarchy);
-
-		//	foreach (var child in uieDefaultProperty.Children())
-		//	{
-		//		Debug.Log(child);
-		//	}
-
-		//	root.Add(uieDefaultProperty);
-		//}
-		//while (property.NextVisible(false));
-		// Also
-
-		//property = serializedQuest.FindProperty("id");
-		//root.Add(new PropertyField(property));
-
-		// Bind the entire window.
-		//root.Bind(serializedQuest);
-		//sData.data = workingQuest;
-		//var serializedQuest = new SerializedObject(sData);
+		questBox.Add(optionsBox);
+		optionsBox.Add(questOptionHeader);
+		optionsBox.Add(addQuestButton);
+		optionsBox.Add(questOptions);
 
 		HelpBox status = new() { name = "editStatus" };
 		status.style.display = DisplayStyle.None;
-		root.Add(status);
 		Button saveButton = new(SaveQuest) { text = "Save" };
-		root.Add(saveButton);
 		Button deleteButton = new(DeleteQuest) { text = "Delete" };
+
+		root.Add(status);
+		root.Add(saveButton);
 		root.Add(deleteButton);
+
+		questID.value = quest.id;
+		questTitle.value = quest.title;
+		questDescription.value = quest.description;
 
 		editingID = quest.id;
 
 		workingQuest = quest;
-		Debug.Log($"Loading quest {quest.id}");
-		//(root.Q("questID") as TextField).value = quest.id;
-		//(root.Q("questTitle") as TextField).value = quest.title;
-		//(root.Q("questDescription") as TextField).value = quest.description;
+		Debug.Log($"Loading Quest {quest.id}");
 
 		//root.Q("ad").parent
 
@@ -181,7 +174,7 @@ public class QuestCreator : EditorWindow
 
 	private void OnSelectNewQuest(IEnumerable<object> selectedItem) => InstantiateEditPanel(questData.quests[(rootVisualElement.Q("questListDisplay") as ListView).selectedIndex]);
 
-	VisualElement MakeLoadQuestEntry()
+	VisualElement InstantiateLoadQuestEntry()
 	{
 		VisualElement parent = new Label();
 		return parent;
@@ -190,6 +183,69 @@ public class QuestCreator : EditorWindow
 	void BindLoadQuestEntry(VisualElement item, int index)
 	{
 		(item as Label).text = questData.quests[index].id;
+	}
+
+	VisualElement InstantiateQuestOption()
+	{
+		VisualElement parent = new Foldout() { name = "optionFoldout" };
+		TextField description = new("Description") { name = "optionDescription" };
+		Button deleteButton = new() { name = "deleteButton", text = "Delete Option" };
+
+
+		Label optionCostsHeader = new("Costs");
+		Button addCostButton = new(AddResourceCost) { text = "Add Cost" };
+		optionCostsHeader.AddToClassList("header3");
+
+		MultiColumnListView optionCosts = new()
+		{
+			name = "questCostsList",
+			virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight
+		};
+		Column costResource = new()
+		{
+			name = "costResource",
+			makeCell = () => new EnumField()
+		};
+		Column costQuantity = new()
+		{
+			name = "Quantity",
+			makeCell = () => new IntegerField()
+		};
+		optionCosts.columns.Add(costResource);
+		optionCosts.columns.Add(costQuantity);
+
+
+		IntegerField knightCost = new("Knights") { name = "knightCost" };
+		FloatField duration = new("Duration") { name = "duration" };
+
+
+		deleteButton.RegisterCallback<ClickEvent>(e => DeleteOption(deleteButton));
+		parent.Add(description);
+		parent.Add(optionCostsHeader);
+		parent.Add(addCostButton);
+		parent.Add(optionCosts);
+		parent.Add(knightCost);
+		parent.Add(duration);
+		parent.Add(deleteButton);
+		return parent;
+	}
+
+	void BindQuestOption(VisualElement item, int index)
+	{
+		item.userData = index;
+		(item as Foldout).text = $"Option {index + 1}";
+		(item.Q("optionDescription") as TextField).value = workingQuest.options[index].description;
+		item.Q("deleteButton").userData = index;
+	}
+
+	VisualElement InstantiateResourceCost()
+	{
+		return null;
+	}
+
+	void BindResourceCost(VisualElement item, int index)
+	{
+
 	}
 
 	void CreateQuest()
@@ -266,12 +322,30 @@ public class QuestCreator : EditorWindow
 		WriteFile();
 	}
 
+	void AddQuestOption()
+	{
+		workingQuest.options.Add(new QuestOption());
+		Debug.Log(workingQuest.options.Count);
+		(rootVisualElement.Q("questOptionsList") as ListView).Rebuild();
+	}
+
 	void DeleteQuest()
 	{
 		questData.quests.Remove(questData.quests.First(q => q.id == editingID));
 		rootVisualElement.Q("editPanel").Clear();
 		(rootVisualElement.Q("questListDisplay") as ListView).Rebuild();
 		WriteFile();
+	}
+
+	void DeleteOption(VisualElement button)
+	{
+		workingQuest.options.RemoveAt((int)button.userData);
+		(rootVisualElement.Q("questOptionsList") as ListView).Rebuild();
+	}
+
+	void AddResourceCost()
+	{
+
 	}
 
 	private string WriteFile()

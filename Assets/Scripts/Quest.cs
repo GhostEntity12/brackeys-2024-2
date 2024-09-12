@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ScriptableQuest : ScriptableObject
@@ -19,15 +20,15 @@ public class Quest
 	public string id;
 	public string title;
 	public string description;
-	public QuestOption[] options;
+	public List<QuestOption> options = new();
 }
 
 [System.Serializable]
 public class QuestOption
 {
 	public string description;
-	public ResourceCost[] costs;
-	public ResourceCost[] rewards;
+	public List<ResourceCost> costs = new();
+	public List<ResourceCost> rewards = new();
 	public int knights;
 	public float duration;
 	public string[] questIdsToAdd;
