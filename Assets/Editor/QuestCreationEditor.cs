@@ -117,7 +117,7 @@ public class QuestCreationEditor : EditorWindow
 		BindableElement dataBind = new() { bindingPath = "data" };
 		TextField id = new("ID") { bindingPath = "id" };
 		TextField title = new("Title") { bindingPath = "title" };
-		TextField description = new("Description") { bindingPath = "description" };
+		TextField description = new("Description") { bindingPath = "description", multiline = true };
 		GroupBox optionsBox = new();
 		Label optionsLabel = new("Options");
 		optionsLabel.AddToClassList("header2");
@@ -132,7 +132,7 @@ public class QuestCreationEditor : EditorWindow
 			{
 				Foldout optionHeader = new() { text = "Option" };
 				BindableElement optionBind = new() { bindingPath = "options" };
-				TextField description = new("Description") { bindingPath = "description" };
+				TextField description = new("Description") { bindingPath = "description", multiline = true };
 				IntegerField knights = new("Knights") { bindingPath = "knights" };
 				FloatField duration = new("Duration") { bindingPath = "duration" };
 				VisualElement costsAndRewardsContainer = new() { name = "costsAndRewardsContainer" };
