@@ -1,1 +1,47 @@
-{"quests":[]}
+{
+	"quests": [
+		{
+			"id": "calmTownTrade",
+			"title": "Nearby Town Trade",
+			"description": "“Hello, Your Majesty, we happen to have a surplus of supplies that would be happy to trade away for a small portion of your gold if you would like.”",
+			"options": [
+				{
+					"description": "\"We'll take the wood!\"",
+					"costs": [
+						{
+							"resource": 1,
+							"quantity": -40
+						}
+					],
+					"rewards": [
+						{
+							"resource": 0,
+							"quantity": 30
+						}
+					],
+					"knights": 2,
+					"duration": 10.0,
+					"questIdsToAdd": []
+				},
+				{
+					"description": "\"We need more food\"",
+					"costs": [
+						{
+							"resource": 3,
+							"quantity": -50
+						}
+					],
+					"rewards": [
+						{
+							"resource": 0,
+							"quantity": 30
+						}
+					],
+					"knights": 2,
+					"duration": 10.0,
+					"questIdsToAdd": []
+				}
+			]
+		}
+	]
+}
