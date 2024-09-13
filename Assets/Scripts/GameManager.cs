@@ -79,4 +79,6 @@ public class GameManager : Singleton<GameManager>
 				throw new System.NotImplementedException();
 		}
 	}
+
+	public Quest GetFirstQuest() => allQuests[0];
 }
