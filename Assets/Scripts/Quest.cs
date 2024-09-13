@@ -1,22 +1,10 @@
 using System.Collections.Generic;
+using GameResources;
 using UnityEngine;
-
-public class ScriptableQuest : ScriptableObject
-{
-	public Quest data = new();
-}
 
 [System.Serializable]
 public class Quest
 {
-	public enum Resources
-	{
-		Gold,
-		Wood,
-		Medicine,
-		Food,
-		People
-	}
 	public string id;
 	public string title;
 	public string description;
@@ -34,10 +22,25 @@ public class QuestOption
 	public string[] questIdsToAdd;
 }
 
-
 [System.Serializable]
 public struct ResourceCost
 {
-	public Quest.Resources resource;
+	public Resource resource;
 	public int quantity;
+}
+
+public class ScriptableQuest : ScriptableObject
+{
+	public Quest data;
+}
+
+namespace GameResources {
+	public enum Resource
+	{
+		Gold,
+		Wood,
+		Medicine,
+		Food,
+		People
+	}
 }
