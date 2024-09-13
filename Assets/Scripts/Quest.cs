@@ -34,6 +34,11 @@ public class ScriptableQuest : ScriptableObject
 	public Quest data;
 }
 
+public class QuestData
+{
+	public List<Quest> quests = new();
+}
+
 namespace GameResources {
 	public enum Resource
 	{
