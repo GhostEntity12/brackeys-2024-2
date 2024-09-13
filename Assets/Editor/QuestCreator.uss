@@ -1,0 +1,62 @@
+VisualElement {}
+
+GroupBox {
+	border-width: 1px;
+	border-radius: 5px;
+	border-color: grey;
+}
+
+Foldout {
+	height: auto;
+	flex-grow: 1;
+	border-width: 1px;
+	border-radius: 5px;
+	border-color: grey;
+	background-color: #444;
+	margin-bottom: 3px;
+}
+
+.header1 {
+	-unity-font-style: bold;
+	font-size:18px;
+}
+
+.header2 {
+	-unity-font-style: bold;
+	font-size:16px;
+}
+
+.header3 {
+	-unity-font-style: bold;
+	font-size:14px;
+}
+
+#questBox {
+	flex-grow: 1;
+	flex-shrink: 1
+}
+
+#loadPanel{
+	flex-grow: 1;
+	flex-shrink: 1
+}
+#deleteButton{
+	background-color: #892B2B;
+	-unity-font-style: bold;
+}
+
+#costsAndRewardsContainer {
+	flex-direction: row
+}
+
+.costsAndRewards {
+	flex-grow: 1
+}
+
+.resourceCostParent {
+	flex-direction: row
+}
+
+.resourceCostComponent {
+	flex-grow: 1
+}
