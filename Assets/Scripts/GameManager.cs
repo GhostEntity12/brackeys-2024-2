@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
 	public enum Resource
 	{
@@ -19,6 +20,32 @@ public class GameManager : MonoBehaviour
 	private int food = 0;
 	private int people = 0;
 
+	private List<Quest> allQuests = new();
+
+	readonly string path = $"{Application.dataPath}/Resources/";
+	readonly string fileName = "quest.json";
+
+	[SerializeField] Clock clock;
+	//[SerializeField] QuestBanner banner;
+	[SerializeField] PointOfInterest[] pointsOfInterest;
+
+	protected override void Awake()
+	{
+		base.Awake();
+		string jsonRaw = File.ReadAllText($"{path}{fileName}");
+		Debug.Log("Quest file found, reading.");
+		allQuests = ((QuestData)JsonUtility.FromJson(jsonRaw, typeof(QuestData))).quests;
+		Debug.Log($"Loaded {allQuests.Count} from file.");
+
+		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
+	}
+
+	public bool GetQuestByID(string id, out Quest quest)
+	{
+		quest = allQuests.Find(x => x.id == id);
+		return quest != null;
+	}
+
 	public int GetResourceQuantity(Resource resource) => resource switch
 	{
 		Resource.Gold => gold,
@@ -29,7 +56,8 @@ public class GameManager : MonoBehaviour
 		_ => throw new System.NotImplementedException(),
 	};
 
-	public int AddResource(Resource resource, int quantity) {
+	public int AddResource(Resource resource, int quantity)
+	{
 		switch (resource)
 		{
 			case Resource.Gold:

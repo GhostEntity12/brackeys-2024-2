@@ -350,8 +350,3 @@ public class QuestCreationEditor : EditorWindow
 		Debug.Log($"Loaded {quests.quests.Count} quests into memory.");
 	}
 }
-
-public class QuestData
-{
-	public List<Quest> quests = new();
-}
