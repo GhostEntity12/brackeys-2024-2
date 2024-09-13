@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -11,6 +11,7 @@ public class EditorTestEditor : EditorWindow
 	readonly string fileName = "data.json";
 	EditorTestData data;
 	int currentIndex = 0;
+	SerializedObject workingSerializedObject;
 
 	[MenuItem("Tools/EditorTest")]
 	public static void ShowWindow()
@@ -24,38 +25,126 @@ public class EditorTestEditor : EditorWindow
 		ReadFile();
 		VisualElement root = rootVisualElement;
 
-		TextField id = new("ID") { bindingPath = "data.id" };
-		TextField title = new("Title") { bindingPath = "data.title" };
-		TextField description = new("Description") { bindingPath = "data.description" };
+		// Load styles
+		var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/QuestCreator.uss");
+		root.styleSheets.Add(styleSheet);
+		Label header = new("Editing Quest");
+		header.AddToClassList("header1");
 		Button nextButton = new(NextTestItem) { text = "Next" };
+		BindableElement dataBind = new() { bindingPath = "data" };
+		TextField id = new("ID") { bindingPath = "id" };
+		TextField title = new("Title") { bindingPath = "title" };
+		TextField description = new("Description") { bindingPath = "description" };
+		GroupBox optionsBox = new();
+		Label optionsLabel = new("Options");
+		optionsLabel.AddToClassList("header2");
+		ListView options = new()
+		{
+			name = "questOptionsList",
+			bindingPath = "questOptions",
+			virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+			reorderable = true,
+			reorderMode = ListViewReorderMode.Animated,
+			makeItem = () =>
+			{
+				Foldout optionHeader = new() { text = "Option" };
+				BindableElement optionBind = new() { bindingPath = "questOptions" };
+				TextField description = new("Description") { bindingPath = "description" };
+				IntegerField knights = new("Knights") { bindingPath = "knights" };
+				FloatField duration = new("Duration") { bindingPath = "duration" };
+				VisualElement costsAndRewardsContainer = new() { name = "costsAndRewardsContainer" };
+				GroupBox costsBox = new();
+				costsBox.AddToClassList("costsAndRewards");
+				Label costLabel = new("Costs");
+				costLabel.AddToClassList("header3");
+				ListView costs = new()
+				{
+					name = "optionCostsList",
+					bindingPath = "costs",
+					virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+					reorderable = true,
+					reorderMode = ListViewReorderMode.Animated,
+					makeItem = () =>
+					{
+						VisualElement costHeader = new();
+						BindableElement costBind = new() { bindingPath = "costs" };
+						costBind.AddToClassList("resourceCostParent");
+						EnumField costResource = new() { bindingPath = "resource" };
+						costResource.AddToClassList("resourceCostComponent");
+						IntegerField costQuantity = new() { bindingPath = "quantity" };
+						costQuantity.AddToClassList("resourceCostComponent");
 
-		root.Add(id);
-		root.Add(title);
-		root.Add(description);
+						costHeader.Add(costBind);
+						costBind.Add(costResource);
+						costBind.Add(costQuantity);
+						return costHeader;
+					}
+				};
+				GroupBox rewardsBox = new();
+				rewardsBox.AddToClassList("costsAndRewards");
+				Label rewardsLabel = new("Rewards");
+				rewardsLabel.AddToClassList("header3");
+				ListView rewards = new()
+				{
+					name = "optionRewardsList",
+					bindingPath = "rewards",
+					virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+					reorderable = true,
+					reorderMode = ListViewReorderMode.Animated,
+					makeItem = () =>
+					{
+						VisualElement rewardHeader = new();
+						BindableElement rewardBind = new() { bindingPath = "rewards" };
+						rewardBind.AddToClassList("resourceCostParent");
+						EnumField rewardResource = new() { bindingPath = "resource" };
+						rewardResource.AddToClassList("resourceCostComponent");
+						IntegerField rewardQuantity = new() { bindingPath = "quantity" };
+						rewardQuantity.AddToClassList("resourceCostComponent");
+
+						rewardHeader.Add(rewardBind);
+						rewardBind.Add(rewardResource);
+						rewardBind.Add(rewardQuantity);
+						return rewardHeader;
+					}
+				};
+				optionHeader.Add(optionBind);
+				optionBind.Add(description);
+				optionBind.Add(knights);
+				optionBind.Add(duration);
+				optionBind.Add(costsAndRewardsContainer);
+				costsAndRewardsContainer.Add(costsBox);
+				costsBox.Add(costLabel);
+				costsBox.Add(costs);
+				costsAndRewardsContainer.Add(rewardsBox);
+				rewardsBox.Add(rewardsLabel);
+				rewardsBox.Add(rewards);
+				return optionHeader;
+			}
+		};
+
+		root.Add(header);
 		root.Add(nextButton);
-
-		TextField newId = new("ID") { name = "addID" };
-		TextField newTitle = new("Title") { name = "addTitle" };
-		TextField newDescription = new("Description") { name = "addDescription" };
-		Button addButton = new(AddTestItem) { text = "Add" };
-
-		root.Add(newId);
-		root.Add(newTitle);
-		root.Add(newDescription);
-		root.Add(addButton);
+		root.Add(dataBind);
+		dataBind.Add(id);
+		dataBind.Add(title);
+		dataBind.Add(description);
+		dataBind.Add(optionsBox);
+		optionsBox.Add(optionsLabel);
+		optionsBox.Add(options);
 
 		Button writeButton = new(Save) { text = "Write to Disk" };
 
-		root.Bind(CreateSerializedObject(data.list[0]));
+		root.Add(writeButton);
 
-		Debug.Log(data.list.Count);
+		SetWorkingSerializedObject(data.list[currentIndex]);
 	}
 
-	SerializedObject CreateSerializedObject(EditorTest data)
+	private void SetWorkingSerializedObject(EditorTest data)
 	{
 		ScriptableEditorTest obj = CreateInstance<ScriptableEditorTest>();
 		obj.data = data;
-		return new(obj);
+		workingSerializedObject = new SerializedObject(obj);
+		rootVisualElement.Bind(workingSerializedObject);
 	}
 
 	void NextTestItem()
@@ -65,7 +154,7 @@ public class EditorTestEditor : EditorWindow
 		{
 			currentIndex = 0;
 		}
-		rootVisualElement.Bind(CreateSerializedObject(data.list[currentIndex]));
+		SetWorkingSerializedObject(data.list[currentIndex]);
 	}
 
 	void AddTestItem()
@@ -76,7 +165,7 @@ public class EditorTestEditor : EditorWindow
 		data.list.Add(new EditorTest(id, title, description));
 
 		currentIndex = data.list.Count - 1;
-		rootVisualElement.Bind(CreateSerializedObject(data.list[currentIndex]));
+		SetWorkingSerializedObject(data.list[currentIndex]);
 		Save();
 	}
 
