@@ -188,6 +188,18 @@ public class QuestCreationEditor : EditorWindow
 						return rewardHeader;
 					}
 				};
+				GroupBox unlocksBox = new();
+				Label unlocksLabel = new("Quests to Unlock");
+				unlocksLabel.AddToClassList("header3");
+				ListView unlocks = new()
+				{
+					name = "unlockList",
+					bindingPath = "questIdsToAdd",
+					virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+					reorderable = true,
+					reorderMode = ListViewReorderMode.Animated,
+					makeItem = () => new TextField() 
+				};
 				optionHeader.Add(optionBind);
 				optionBind.Add(description);
 				optionBind.Add(knights);
@@ -199,6 +211,10 @@ public class QuestCreationEditor : EditorWindow
 				costsAndRewardsContainer.Add(rewardsBox);
 				rewardsBox.Add(rewardsLabel);
 				rewardsBox.Add(rewards);
+				optionBind.Add(unlocksBox);
+				unlocksBox.Add(unlocksLabel);
+				unlocksBox.Add(unlocks);
+				unlocksBox.Add(unlocks);
 				return optionHeader;
 			}
 		};

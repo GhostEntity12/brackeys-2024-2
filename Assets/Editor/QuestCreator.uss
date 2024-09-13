@@ -18,17 +18,17 @@ Foldout {
 
 .header1 {
 	-unity-font-style: bold;
-	font-size:16px;
+	font-size:18px;
 }
 
 .header2 {
 	-unity-font-style: bold;
-	font-size:14px;
+	font-size:16px;
 }
 
 .header3 {
 	-unity-font-style: bold;
-	font-size:13px;
+	font-size:14px;
 }
 
 #questBox {
