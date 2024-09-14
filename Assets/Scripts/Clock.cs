@@ -32,7 +32,7 @@ public class Clock : MonoBehaviour
 		currentTime = Mathf.Min(totalTime, currentTime + Time.deltaTime);
 
 		// Storm starts
-		if (!isStorm && currentTime > stormTime)
+		if (!isStorm && currentTime > calmTime)
 		{
 			isStorm = true;
 			OnStormStart?.Invoke(this, EventArgs.Empty);
@@ -43,7 +43,6 @@ public class Clock : MonoBehaviour
 		{
 			OnStormEnd?.Invoke(this, EventArgs.Empty);
 		}
-
 
 		clockHand.rotation = Quaternion.Euler(new(0, 0, currentTime / totalTime * -360));
 	}
