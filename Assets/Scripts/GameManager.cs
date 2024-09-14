@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
-	public InputActions InputActions { get; private set; } 
+	public InputActions InputActions { get; private set; }
+	[field: SerializeField] public QuestScroll QuestScroll { get; private set; }
 
 	private int gold = 0;
 	private int wood = 0;
@@ -15,19 +16,18 @@ public class GameManager : Singleton<GameManager>
 	private int people = 0;
 
 	private bool isStorm;
-	
+
 	private List<Quest> allQuests = new();
 
 	readonly string path = $"{Application.dataPath}/Resources/";
 	readonly string fileName = "quest.json";
 
 	[SerializeField] Clock clock;
-	//[SerializeField] QuestBanner banner;
 	[SerializeField] PointOfInterest[] pointsOfInterest;
 
 	[SerializeField] Vector2 timerBounds;
-
-	float timer = 0;
+	[SerializeField] float stormQuestFrequencyModifier = 2;
+	float timer = 5;
 
 
 	protected override void Awake()
@@ -40,8 +40,8 @@ public class GameManager : Singleton<GameManager>
 
 		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
 
-		clock.OnStormStart += (sender, args) => SetStormState(true);
-		clock.OnStormEnd += (sender, args) => SetStormState(false);
+		clock.OnStormStart += (_, _) => isStorm = true;
+		clock.OnStormEnd += (_, _) => isStorm = false;
 
 		InputActions = new();
 	}
@@ -59,6 +59,7 @@ public class GameManager : Singleton<GameManager>
 		// Timer hit zero, attempt to spawn a quest
 		// Reset timer
 		timer = Random.Range(timerBounds.x, timerBounds.y);
+		if (isStorm) timer /= stormQuestFrequencyModifier;
 
 		PointOfInterest poi = pointsOfInterest[Random.Range(0, pointsOfInterest.Length)];
 
@@ -111,8 +112,4 @@ public class GameManager : Singleton<GameManager>
 				throw new System.NotImplementedException();
 		}
 	}
-
-	void SetStormState(bool stormActive) => isStorm = stormActive;
-
-	public Quest GetFirstQuest() => allQuests[0];
 }
