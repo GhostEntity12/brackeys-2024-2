@@ -8,7 +8,9 @@ public class QuestScroll : MonoBehaviour
 	[SerializeField] TextMeshProUGUI titleText;
 	[SerializeField] TextMeshProUGUI descriptionText;
 	[SerializeField] QuestScrollOption[] options;
-	public void SetQuest(Quest quest)
+	PointOfInterest eventLocation;
+
+	public void SetQuest(Quest quest, PointOfInterest location)
 	{
 		titleText.text = quest.title;
 		descriptionText.text = quest.description;
@@ -21,18 +23,7 @@ public class QuestScroll : MonoBehaviour
 		}
 	}
 
-	private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Q))
-		{
-			OpenScroll();
-		}
-		else if (Input.GetKeyDown(KeyCode.R))
-		{
-			CloseScroll();
-		}
-	}
-
+	// Debug Functions
 	[ContextMenu("Open")]
 	public void OpenScroll()
 	{
@@ -48,6 +39,6 @@ public class QuestScroll : MonoBehaviour
 	[ContextMenu("Load")]
 	public void LoadTestQuest()
 	{
-		SetQuest(GameManager.Instance.GetFirstQuest());
+		SetQuest(GameManager.Instance.GetFirstQuest(), null);
 	}
 }
