@@ -13,6 +13,7 @@ public class GameManager : Singleton<GameManager>
 		Food,
 		People
 	}
+	public InputActions InputActions { get; private set; } 
 
 	private int gold = 0;
 	private int wood = 0;
@@ -38,6 +39,7 @@ public class GameManager : Singleton<GameManager>
 		Debug.Log($"Loaded {allQuests.Count} from file.");
 
 		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
+		InputActions = new();
 	}
 
 	public bool GetQuestByID(string id, out Quest quest)
