@@ -1,51 +1,57 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
+[RequireComponent(typeof(EventTrigger), typeof(BoxCollider))]
 public class PointOfInterest : MonoBehaviour
 {
-	[SerializeField] private List<string> calmQuestIDs = new();
-	[SerializeField] private List<string> stormQuestIDs = new();
+	[SerializeField] private List<string> questIDs = new();
 
 	private List<Quest> calmQuests = new();
 	private List<Quest> stormQuests = new();
 
 	public Quest ActiveQuest { get; private set; }
 
+	private float questDespawnTimer = 30;
+	private float timer;
+	private EventTrigger eventTrigger;
+	[SerializeField] SpriteRenderer flag;
+
+	private void Awake()
+	{
+		eventTrigger = GetComponent<EventTrigger>();
+	}
+
 	public Vector2 Location { get; private set; }
 
 	// Start is called before the first frame update
 	void Start()
 	{
-		List<Quest> tempList = new();
-		foreach (string id in calmQuestIDs)
-		{
-			if (GameManager.Instance.GetQuestByID(id, out Quest q))
-			{
-				tempList.Add(q);
-			}
-			else
-			{
-				Debug.LogError($"Quest with {id} could not be found");
-			}
-		}
-		tempList.Shuffle();
-		calmQuests = new(tempList);
-		tempList.Clear();
-		foreach (string id in stormQuestIDs)
-		{
-			if (GameManager.Instance.GetQuestByID(id, out Quest q))
-			{
-				tempList.Add(q);
-			}
-			else
-			{
-				Debug.LogError($"Quest with {id} could not be found");
-			}
-		}
-		tempList.Shuffle();
-		stormQuests = new(tempList);
+		AddQuests(questIDs);
 		Location = new(transform.position.x, transform.position.z);
+
+
+		EventTrigger.Entry entry = new()
+		{
+			eventID = EventTriggerType.PointerClick
+		};
+		entry.callback.AddListener((data) =>
+		{
+			OnPointerDownDelegate((PointerEventData)data);
+		});
+		eventTrigger.triggers.Add(entry);
 	}
+
+	private void Update()
+	{
+		if (ActiveQuest == null) return;
+
+		timer -= Time.deltaTime;
+		if (timer > 0) return;
+
+		ClearQuest();
+	}
+
 
 	public void AddQuests(List<string> questIDs)
 	{
@@ -67,7 +73,21 @@ public class PointOfInterest : MonoBehaviour
 		stormQuests.Shuffle();
 	}
 
-	public void SetQuest(Quest q) => ActiveQuest = q;
+	public void SetQuest(Quest q)
+	{
+		// Set the active quest
+		ActiveQuest = q;
+		// Set the quest despawn timer
+		timer = questDespawnTimer;
+		// Set the flag
+		flag.enabled = true;
+	}
+
+	public void ClearQuest()
+	{
+		ActiveQuest = null;
+		flag.enabled = false;
+	}
 
 
 	public bool TryGetQuest(bool isStorm, out Quest quest)
@@ -75,7 +95,7 @@ public class PointOfInterest : MonoBehaviour
 		// A bit jank but works
 		List<Quest> listToUse = isStorm ? stormQuests : calmQuests;
 		quest = null;
-		if (listToUse.Count == 0) return false;
+		if (listToUse.Count == 0 || ActiveQuest != null) return false;
 		else
 		{
 			quest = listToUse[0];
@@ -84,5 +104,8 @@ public class PointOfInterest : MonoBehaviour
 		}
 	}
 
-	public int AvailableQuests(bool isStorm) => isStorm ? stormQuests.Count : calmQuests.Count;
+	public void OnPointerDownDelegate(PointerEventData data)
+	{
+		Debug.Log("OnPointerDownDelegate called.");
+	}
 }

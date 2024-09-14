@@ -23,22 +23,15 @@ public class QuestScroll : MonoBehaviour
 		}
 	}
 
-	// Debug Functions
-	[ContextMenu("Open")]
 	public void OpenScroll()
 	{
 		LeanTween.moveX(paper, 0, 0.5f).setEaseInOutQuad();
 		LeanTween.moveX(root, 0, 0.5f).setEaseInOutQuad();
 	}
-	[ContextMenu("Close")]
 	public void CloseScroll()
 	{
 		LeanTween.moveX(paper, -680, 0.5f).setEaseInOutQuad();
 		LeanTween.moveX(root, 340, 0.5f).setEaseInOutQuad();
 	}
-	[ContextMenu("Load")]
-	public void LoadTestQuest()
-	{
-		SetQuest(GameManager.Instance.GetFirstQuest(), null);
-	}
 }
+
