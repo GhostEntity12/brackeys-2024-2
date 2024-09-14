@@ -1,3 +1,4 @@
+using GameResources;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -5,14 +6,6 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
-	public enum Resource
-	{
-		Gold,
-		Wood,
-		Medicine,
-		Food,
-		People
-	}
 	public InputActions InputActions { get; private set; } 
 
 	private int gold = 0;
@@ -21,6 +14,8 @@ public class GameManager : Singleton<GameManager>
 	private int food = 0;
 	private int people = 0;
 
+	private bool isStorm;
+	
 	private List<Quest> allQuests = new();
 
 	readonly string path = $"{Application.dataPath}/Resources/";
@@ -29,6 +24,11 @@ public class GameManager : Singleton<GameManager>
 	[SerializeField] Clock clock;
 	//[SerializeField] QuestBanner banner;
 	[SerializeField] PointOfInterest[] pointsOfInterest;
+
+	[SerializeField] Vector2 timerBounds;
+
+	float timer = 0;
+
 
 	protected override void Awake()
 	{
@@ -39,7 +39,37 @@ public class GameManager : Singleton<GameManager>
 		Debug.Log($"Loaded {allQuests.Count} from file.");
 
 		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
+
+		clock.OnStormStart += (sender, args) => SetStormState(true);
+		clock.OnStormEnd += (sender, args) => SetStormState(false);
+
 		InputActions = new();
+	}
+
+	private void Update()
+	{
+		EventsUpdate();
+	}
+
+	private void EventsUpdate()
+	{
+		timer -= Time.deltaTime;
+		if (timer > 0) return;
+
+		// Timer hit zero, attempt to spawn a quest
+		// Reset timer
+		timer = Random.Range(timerBounds.x, timerBounds.y);
+
+		PointOfInterest poi = pointsOfInterest[Random.Range(0, pointsOfInterest.Length)];
+
+		if (!poi.TryGetQuest(isStorm, out Quest q))
+		{
+			// Chosen PoI has no quests or already has a quest. Halve the timer
+			timer *= 0.5f;
+			return;
+		}
+
+		poi.SetQuest(q);
 	}
 
 	public bool GetQuestByID(string id, out Quest quest)
@@ -58,29 +88,31 @@ public class GameManager : Singleton<GameManager>
 		_ => throw new System.NotImplementedException(),
 	};
 
-	public int AddResource(Resource resource, int quantity)
+	public int AddResource(ResourceCost resourceCost)
 	{
-		switch (resource)
+		switch (resourceCost.resource)
 		{
 			case Resource.Gold:
-				gold += quantity;
+				gold += resourceCost.quantity;
 				return gold;
 			case Resource.Wood:
-				wood += quantity;
+				wood += resourceCost.quantity;
 				return wood;
 			case Resource.Medicine:
-				medicine += quantity;
+				medicine += resourceCost.quantity;
 				return medicine;
 			case Resource.Food:
-				food += quantity;
+				food += resourceCost.quantity;
 				return food;
 			case Resource.People:
-				people += quantity;
+				people += resourceCost.quantity;
 				return people;
 			default:
 				throw new System.NotImplementedException();
 		}
 	}
+
+	void SetStormState(bool stormActive) => isStorm = stormActive;
 
 	public Quest GetFirstQuest() => allQuests[0];
 }
