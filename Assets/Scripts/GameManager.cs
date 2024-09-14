@@ -8,6 +8,7 @@ public class GameManager : Singleton<GameManager>
 {
 	public InputActions InputActions { get; private set; }
 	[field: SerializeField] public QuestScroll QuestScroll { get; private set; }
+	[field: SerializeField] public Fade Fade { get; private set; }
 
 	private int gold = 0;
 	private int wood = 0;

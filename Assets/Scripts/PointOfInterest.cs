@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(EventTrigger), typeof(BoxCollider))]
 public class PointOfInterest : MonoBehaviour
@@ -37,7 +38,7 @@ public class PointOfInterest : MonoBehaviour
 		};
 		entry.callback.AddListener((data) =>
 		{
-			OnPointerDownDelegate((PointerEventData)data);
+			OnClicked((PointerEventData)data);
 		});
 		eventTrigger.triggers.Add(entry);
 	}
@@ -104,8 +105,13 @@ public class PointOfInterest : MonoBehaviour
 		}
 	}
 
-	public void OnPointerDownDelegate(PointerEventData data)
+	public void OnClicked(PointerEventData data)
 	{
-		Debug.Log("OnPointerDownDelegate called.");
+		if (ActiveQuest != null)
+		{
+			GameManager.Instance.QuestScroll.SetQuest(ActiveQuest, this);
+			GameManager.Instance.QuestScroll.OpenScroll(data.position);
+		}
+
 	}
 }
