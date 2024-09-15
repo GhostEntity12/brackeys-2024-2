@@ -1,14 +1,31 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class QuestScroll : MonoBehaviour
 {
+	RectTransform parent;
 	[SerializeField] RectTransform paper;
 	[SerializeField] RectTransform root;
 	[SerializeField] TextMeshProUGUI titleText;
 	[SerializeField] TextMeshProUGUI descriptionText;
 	[SerializeField] QuestScrollOption[] options;
-	public void SetQuest(Quest quest)
+	[SerializeField] CanvasGroup group;
+	PointOfInterest eventLocation;
+
+	InputActions actions;
+
+	private void Awake()
+	{
+		parent = GetComponent<RectTransform>();
+	}
+
+	private void Start()
+	{
+		actions = GameManager.Instance.InputActions;
+	}
+
+	public void SetQuest(Quest quest, PointOfInterest location)
 	{
 		titleText.text = quest.title;
 		descriptionText.text = quest.description;
@@ -19,35 +36,28 @@ public class QuestScroll : MonoBehaviour
 				options[i].SetValues(quest.options[i]);
 			}
 		}
+		eventLocation = location;
 	}
 
-	private void Update()
+	public void OpenScroll(Vector3 startingPos)
 	{
-		if (Input.GetKeyDown(KeyCode.Q))
-		{
-			OpenScroll();
-		}
-		else if (Input.GetKeyDown(KeyCode.R))
-		{
-			CloseScroll();
-		}
+		parent.position = startingPos;
+		LeanTween.move(parent, Vector3.zero, 0.2f).setEaseInOutCubic();
+		LeanTween.scale(parent, Vector3.one, 0.3f).setEaseOutBack();
+		LeanTween.moveX(paper, 0, 0.5f).setEaseInOutQuad().setDelay(0.45f);
+		LeanTween.moveX(root, 0, 0.5f).setEaseInOutQuad().setDelay(0.45f);
+		actions.MainGameplay.Movement.Disable();
+		GameManager.Instance.Fade.FadeIn();
+		group.interactable = true;
 	}
-
-	[ContextMenu("Open")]
-	public void OpenScroll()
-	{
-		LeanTween.moveX(paper, 0, 0.5f).setEaseInOutQuad();
-		LeanTween.moveX(root, 0, 0.5f).setEaseInOutQuad();
-	}
-	[ContextMenu("Close")]
 	public void CloseScroll()
 	{
+		LeanTween.scale(parent, Vector3.zero, 0.3f).setEaseInBack().setDelay(0.35f);
 		LeanTween.moveX(paper, -680, 0.5f).setEaseInOutQuad();
 		LeanTween.moveX(root, 340, 0.5f).setEaseInOutQuad();
-	}
-	[ContextMenu("Load")]
-	public void LoadTestQuest()
-	{
-		SetQuest(GameManager.Instance.GetFirstQuest());
+		actions.MainGameplay.Movement.Enable();
+		GameManager.Instance.Fade.FadeOut();
+		group.interactable = false;
 	}
 }
+

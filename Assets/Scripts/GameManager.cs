@@ -1,25 +1,22 @@
-using System.Collections;
+using GameResources;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
-	public enum Resource
-	{
-		Gold,
-		Wood,
-		Medicine,
-		Food,
-		People
-	}
-	public InputActions InputActions { get; private set; } 
+	public InputActions InputActions { get; private set; }
+	[field: SerializeField] public QuestScroll QuestScroll { get; private set; }
+	[field: SerializeField] public Fade Fade { get; private set; }
+	public KnightManager KnightManager { get; private set; }
 
-	private int gold = 0;
-	private int wood = 0;
-	private int medicine = 0;
-	private int food = 0;
-	private int people = 0;
+	[SerializeField] private int gold = 100;
+	[SerializeField] private int wood = 20;
+	[SerializeField] private int medicine = 20;
+	[SerializeField] private int food = 20;
+	[SerializeField] private int people = 0;
+
+	private bool isStorm;
 
 	private List<Quest> allQuests = new();
 
@@ -27,8 +24,13 @@ public class GameManager : Singleton<GameManager>
 	readonly string fileName = "quest.json";
 
 	[SerializeField] Clock clock;
-	//[SerializeField] QuestBanner banner;
 	[SerializeField] PointOfInterest[] pointsOfInterest;
+
+	[SerializeField] Vector2 timerBounds;
+	[SerializeField] float stormQuestFrequencyModifier = 2;
+	float timer = 5;
+
+	readonly List<OptionTimer> timers = new();
 
 	protected override void Awake()
 	{
@@ -38,8 +40,51 @@ public class GameManager : Singleton<GameManager>
 		allQuests = ((QuestData)JsonUtility.FromJson(jsonRaw, typeof(QuestData))).quests;
 		Debug.Log($"Loaded {allQuests.Count} from file.");
 
+		KnightManager = gameObject.AddComponent<KnightManager>();
+
 		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
+
+		clock.OnStormStart += (_, _) => isStorm = true;
+		clock.OnStormEnd += (_, _) => isStorm = false;
+
 		InputActions = new();
+	}
+
+	private void Update()
+	{
+		EventsUpdate();
+		foreach (OptionTimer timer in timers)
+		{
+			if (!timer.Tick(Time.deltaTime)) return;
+
+			foreach (ResourceCost cost in timer.GetCosts())
+			{
+				AddResource(cost);
+			}
+			timers.Remove(timer);
+		}
+	}
+
+	private void EventsUpdate()
+	{
+		timer -= Time.deltaTime;
+		if (timer > 0) return;
+
+		// Timer hit zero, attempt to spawn a quest
+		// Reset timer
+		timer = Random.Range(timerBounds.x, timerBounds.y);
+		if (isStorm) timer /= stormQuestFrequencyModifier;
+
+		PointOfInterest poi = pointsOfInterest[Random.Range(0, pointsOfInterest.Length)];
+
+		if (!poi.TryGetQuest(isStorm, out Quest q))
+		{
+			// Chosen PoI has no quests or already has a quest. Halve the timer
+			timer *= 0.5f;
+			return;
+		}
+
+		poi.SetQuest(q);
 	}
 
 	public bool GetQuestByID(string id, out Quest quest)
@@ -58,29 +103,54 @@ public class GameManager : Singleton<GameManager>
 		_ => throw new System.NotImplementedException(),
 	};
 
-	public int AddResource(Resource resource, int quantity)
+	public int AddResource(ResourceCost resourceCost)
 	{
-		switch (resource)
+		switch (resourceCost.resource)
 		{
 			case Resource.Gold:
-				gold += quantity;
+				gold += resourceCost.quantity;
 				return gold;
 			case Resource.Wood:
-				wood += quantity;
+				wood += resourceCost.quantity;
 				return wood;
 			case Resource.Medicine:
-				medicine += quantity;
+				medicine += resourceCost.quantity;
 				return medicine;
 			case Resource.Food:
-				food += quantity;
+				food += resourceCost.quantity;
 				return food;
 			case Resource.People:
-				people += quantity;
+				people += resourceCost.quantity;
 				return people;
 			default:
 				throw new System.NotImplementedException();
 		}
 	}
 
-	public Quest GetFirstQuest() => allQuests[0];
+	public void QuestOptionSelection(QuestOption selection, PointOfInterest location)
+	{
+		// Add timer for rewards
+		timers.Add(new(selection.rewards, selection.duration));
+		KnightManager.Dispatch(selection.knights, location, selection.duration);
+	}
+}
+
+[System.Serializable]
+class OptionTimer
+{
+	readonly List<ResourceCost> costList;
+	float timer;
+
+	public OptionTimer(List<ResourceCost> costList, float timer)
+	{
+		this.costList = costList;
+		this.timer = timer;
+	}
+	public List<ResourceCost> GetCosts() => costList;
+
+	public bool Tick(float time)
+	{
+		timer -= time;
+		return timer < 0;
+	}
 }
