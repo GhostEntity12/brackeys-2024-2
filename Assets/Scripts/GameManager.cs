@@ -45,6 +45,8 @@ public class GameManager : Singleton<GameManager>
 
 		KnightManager = gameObject.AddComponent<KnightManager>();
 
+		KnightManager.SetKnights(15);
+
 		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
 
 		clock.OnStormStart += (_, _) => isStorm = true;
