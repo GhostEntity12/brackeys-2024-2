@@ -32,13 +32,16 @@ public class GameManager : Singleton<GameManager>
 
 	readonly List<OptionTimer> timers = new();
 
+	[SerializeField] ScriptableQuestList data;
+
 	protected override void Awake()
 	{
 		base.Awake();
-		string jsonRaw = File.ReadAllText($"{path}{fileName}");
-		Debug.Log("Quest file found, reading.");
-		allQuests = ((QuestData)JsonUtility.FromJson(jsonRaw, typeof(QuestData))).quests;
+		allQuests = data.quests;
 		Debug.Log($"Loaded {allQuests.Count} from file.");
+		//string jsonRaw = File.ReadAllText($"{path}{fileName}");
+		//Debug.Log("Quest file found, reading.");
+		//allQuests = ((QuestData)JsonUtility.FromJson(jsonRaw, typeof(QuestData))).quests;
 
 		KnightManager = gameObject.AddComponent<KnightManager>();
 
