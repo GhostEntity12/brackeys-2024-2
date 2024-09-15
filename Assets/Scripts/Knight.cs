@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Knight : MonoBehaviour
 {
+    public delegate void KnightEvent(Knight k);
+    public KnightEvent OnFinishQuest;
     enum State
     {
         Idle,
@@ -21,12 +23,6 @@ public class Knight : MonoBehaviour
     State currentState = State.Idle;
     Queue<Vector3> path;
     Vector3 currentWaypoint;
-
-	// Start is called before the first frame update
-	void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -55,30 +51,31 @@ public class Knight : MonoBehaviour
             case State.Idle:
                 break;
             case State.ToQuest:
-                // Move towards destination
-                Move();
+                
 
 				// Increase timeToDestination
 				timeToDestination += Time.deltaTime;
                 // Decrease remaining quest time
                 questTime -= Time.deltaTime;
-                if (true)
+                if (Move())
                 {
                     // At destination
                     currentState = State.AtQuest;
                 }
                 break;
-            case State.AtQuest:
-                questTime -= Time.deltaTime;
-                if (questTime < timeToDestination)
+			case State.AtQuest:
+				questTime -= Time.deltaTime;
+				if (questTime > timeToDestination) break;
+
+				currentState = State.FromQuest;
+				path = questLocation.PathFrom();
+				break;
+			case State.FromQuest:
+                if (Move())
                 {
-                    currentState = State.FromQuest;
-                    path = questLocation.PathFrom();
+                    currentState = State.Idle;
+                    OnFinishQuest?.Invoke(this);
                 }
-                break;
-            case State.FromQuest:
-                // Move to destination
-                Move();
                 break;
             default:
                 break;
@@ -96,12 +93,19 @@ public class Knight : MonoBehaviour
         currentWaypoint = path.Dequeue();
     }
 
-    void Move()
+    /// <summary>
+    /// Move the Lknght. Returns true if at the end of it's path
+    /// </summary>
+    /// <returns></returns>
+    bool Move()
     {
-		if (Vector3.Distance(transform.position, currentWaypoint) < moveSpeed * Time.deltaTime && path.Count > 0)
+		if (Vector3.Distance(transform.position, currentWaypoint) < moveSpeed * Time.deltaTime)
 		{
+            if (path.Count > 0) return true;
+
 			currentWaypoint = path.Dequeue();
 		}
 		transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, moveSpeed * Time.deltaTime);
+        return false;
 	}
 }
