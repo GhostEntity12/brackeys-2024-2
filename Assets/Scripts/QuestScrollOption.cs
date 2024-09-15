@@ -69,6 +69,7 @@ public class QuestScrollOption : MonoBehaviour
 		}
 		parent.CloseScroll();
 		GameManager.Instance.QuestOptionSelection(option, location);
+		location.ClearQuest();
 	}
 
 	static string ConcatResourceCosts(List<ResourceCost> costs)

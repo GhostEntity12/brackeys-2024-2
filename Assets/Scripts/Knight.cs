@@ -15,7 +15,7 @@ public class Knight : MonoBehaviour
 
     [SerializeField] float moveSpeed;
 
-    bool doMovement;
+    bool doMovement = true;
     float timeToDestination;
     float questTime = 0;
     PointOfInterest questLocation;
@@ -24,9 +24,20 @@ public class Knight : MonoBehaviour
     
     Queue<Vector3> path;
     Vector3 currentWaypoint;
+    SpriteRenderer spriteRenderer;
 
-    // Update is called once per frame
-    void Update()
+	private void Awake()
+	{
+		spriteRenderer = GetComponent<SpriteRenderer>();
+	}
+
+	private void Start()
+	{
+        moveSpeed *= Random.Range(0.9f, 1.1f);
+	}
+
+	// Update is called once per frame
+	void Update()
     {
         if (!doMovement) return;
 
@@ -85,9 +96,12 @@ public class Knight : MonoBehaviour
     {
 		if (Vector3.Distance(transform.position, currentWaypoint) < moveSpeed * Time.deltaTime)
 		{
-            if (path.Count > 0) return true;
+            if (path.Count == 0) return true;
 
 			currentWaypoint = path.Dequeue();
+
+
+            spriteRenderer.flipX = transform.position.x > currentWaypoint.x;
 		}
 		transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, moveSpeed * Time.deltaTime);
         return false;

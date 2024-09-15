@@ -1,7 +1,4 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class KnightManager : MonoBehaviour
@@ -27,10 +24,12 @@ public class KnightManager : MonoBehaviour
 			Knight k = knightQueue.Dequeue();
 			k.SetQuest(location, time);
 		}
+		GameManager.Instance.UpdateKnightDisplay(AvailableKnights);
 	}
 
 	public void ReturnKnight(Knight knight)
 	{
 		knightQueue.Enqueue(knight);
+		GameManager.Instance.UpdateKnightDisplay(AvailableKnights);
 	}
 }

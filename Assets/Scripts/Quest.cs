@@ -29,6 +29,12 @@ public struct ResourceCost
 {
 	public Resource resource;
 	public int quantity;
+
+	public ResourceCost(Resource resource, int quantity)
+	{
+		this.resource = resource;
+		this.quantity = quantity;
+	}
 }
 
 public class ScriptableQuest : ScriptableObject

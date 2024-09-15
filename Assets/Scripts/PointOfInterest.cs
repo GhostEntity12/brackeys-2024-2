@@ -45,6 +45,7 @@ public class PointOfInterest : MonoBehaviour
 			OnClicked((PointerEventData)data);
 		});
 		eventTrigger.triggers.Add(entry);
+		path = CalculatePath();
 	}
 
 	private void Update()

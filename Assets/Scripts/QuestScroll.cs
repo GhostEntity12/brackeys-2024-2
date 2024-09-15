@@ -29,6 +29,7 @@ public class QuestScroll : MonoBehaviour
 	{
 		titleText.text = quest.title;
 		descriptionText.text = quest.description;
+		eventLocation = location;
 		for (int i = 0; i < options.Length; i++)
 		{
 			if (i < quest.options.Count)
@@ -36,7 +37,6 @@ public class QuestScroll : MonoBehaviour
 				options[i].SetValues(quest.options[i], eventLocation);
 			}
 		}
-		eventLocation = location;
 	}
 
 	public void OpenScroll(Vector3 startingPos)

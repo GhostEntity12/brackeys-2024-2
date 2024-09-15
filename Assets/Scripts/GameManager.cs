@@ -1,6 +1,6 @@
 using GameResources;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
@@ -34,6 +34,10 @@ public class GameManager : Singleton<GameManager>
 
 	[SerializeField] ScriptableQuestList data;
 
+	[SerializeField] ResourceDisplay goldDisplay, foodDisplay, medicineDisplay, woodDisplay, knightDisplay, peopleDisplay;
+
+	[SerializeField] EndScreen endScreen;
+
 	protected override void Awake()
 	{
 		base.Awake();
@@ -51,22 +55,30 @@ public class GameManager : Singleton<GameManager>
 
 	private void Start()
 	{
-		clock.OnStormStart += (_, _) => isStorm = true;
-		clock.OnStormEnd += (_, _) => isStorm = false;
+		clock.OnStormStart += (_, _) => { isStorm = true; CheckGameOver(); };
+		clock.OnStormEnd += (_, _) => EndGame(true);
 		KnightManager.SetKnights(15);
+		goldDisplay.UpdateText(gold);
+		foodDisplay.UpdateText(food);
+		medicineDisplay.UpdateText(medicine);
+		woodDisplay.UpdateText(wood);
+		knightDisplay.UpdateText(KnightManager.AvailableKnights);
+		peopleDisplay.UpdateText(people);
 	}
 
 
 	private void Update()
 	{
 		EventsUpdate();
-		foreach (OptionTimer timer in timers)
+		for (int i = timers.Count - 1; i >= 0; i--)
 		{
+			OptionTimer timer = timers[i];
 			if (!timer.Tick(Time.deltaTime)) return;
 
 			foreach (ResourceCost cost in timer.GetCosts())
 			{
 				AddResource(cost);
+				timer.location.AddQuests(timer.selection.questIdsToAdd.ToList());
 			}
 			timers.Remove(timer);
 		}
@@ -116,42 +128,71 @@ public class GameManager : Singleton<GameManager>
 		{
 			case Resource.Gold:
 				gold += resourceCost.quantity;
+				goldDisplay.UpdateText(gold);
 				return gold;
 			case Resource.Wood:
 				wood += resourceCost.quantity;
+				woodDisplay.UpdateText(wood);
 				return wood;
 			case Resource.Medicine:
 				medicine += resourceCost.quantity;
+				medicineDisplay.UpdateText(medicine);
 				return medicine;
 			case Resource.Food:
 				food += resourceCost.quantity;
+				foodDisplay.UpdateText(food);
 				return food;
 			case Resource.People:
 				people += resourceCost.quantity;
+				peopleDisplay.UpdateText(people);
+				if (isStorm && people == 0)
+				{
+					EndGame(false);
+				}
 				return people;
 			default:
 				throw new System.NotImplementedException();
 		}
 	}
 
+	void CheckGameOver()
+	{
+		AddResource(new(Resource.People, 0));
+	}
+
+	void EndGame(bool wonGame)
+	{
+		endScreen.ShowEndScreen(wonGame, people);
+		clock.Stop();
+	}
+
 	public void QuestOptionSelection(QuestOption selection, PointOfInterest location)
 	{
 		// Add timer for rewards
-		timers.Add(new(selection.rewards, selection.duration));
+		timers.Add(new(selection, location));
 		KnightManager.Dispatch(selection.knights, location, selection.duration);
+	}
+
+	public void UpdateKnightDisplay(int amount)
+	{
+		knightDisplay.UpdateText(amount);
 	}
 }
 
 [System.Serializable]
 class OptionTimer
 {
+	public QuestOption selection;
+	public PointOfInterest location;
 	readonly List<ResourceCost> costList;
 	float timer;
 
-	public OptionTimer(List<ResourceCost> costList, float timer)
+	public OptionTimer(QuestOption option, PointOfInterest location)
 	{
-		this.costList = costList;
-		this.timer = timer;
+		this.selection = option;
+		this.costList = option.rewards;
+		this.timer = option.duration;
+		this.location = location;
 	}
 	public List<ResourceCost> GetCosts() => costList;
 

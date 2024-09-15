@@ -93,12 +93,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
+  m_fontSize: 30.6
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -360,6 +360,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5721621082886879152}
   - component: {fileID: 5979515296245982963}
+  - component: {fileID: 7300582022165985636}
   m_Layer: 5
   m_Name: QuestScroll
   m_TagString: Untagged
@@ -376,7 +377,7 @@ RectTransform:
   m_GameObject: {fileID: 2869262883577963563}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 919278314627940054}
@@ -406,6 +407,19 @@ MonoBehaviour:
   options:
   - {fileID: 1302574188078941471}
   - {fileID: 4261348391754942559}
+  group: {fileID: 7300582022165985636}
+--- !u!225 &7300582022165985636
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2869262883577963563}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &3262574810061764767
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,7 +644,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5692414652545951085}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5979515296245982963}
+        m_TargetAssemblyTypeName: QuestScroll, Assembly-CSharp
+        m_MethodName: CloseScroll
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &4765660283739016547
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,7 +692,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 327, y: -80.86}
+  m_AnchoredPosition: {x: 327, y: -116.878}
   m_SizeDelta: {x: 625, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2955266721672052666
@@ -1615,6 +1641,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9111115044316178890, guid: 52ae5235652246541818e97bb6987964,
+        type: 3}
+      propertyPath: parent
+      value: 
+      objectReference: {fileID: 5979515296245982963}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1891,6 +1922,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9111115044316178890, guid: 52ae5235652246541818e97bb6987964,
+        type: 3}
+      propertyPath: parent
+      value: 
+      objectReference: {fileID: 5979515296245982963}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

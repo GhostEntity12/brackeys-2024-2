@@ -46,4 +46,9 @@ public class Clock : MonoBehaviour
 
 		clockHand.rotation = Quaternion.Euler(new(0, 0, currentTime / totalTime * -360));
 	}
+
+	public void Stop()
+	{
+		progressTime = false;
+	}
 }
