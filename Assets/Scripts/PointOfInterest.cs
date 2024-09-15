@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,6 +19,8 @@ public class PointOfInterest : MonoBehaviour
 	private float timer;
 	private EventTrigger eventTrigger;
 	[SerializeField] SpriteRenderer flag;
+	[SerializeField] List<LineRenderer> linesToPoint;
+	List<Vector3> path;
 
 	private void Awake()
 	{
@@ -113,5 +117,26 @@ public class PointOfInterest : MonoBehaviour
 			GameManager.Instance.QuestScroll.OpenScroll(data.position);
 		}
 
+	}
+	public List<Vector3> CalculatePath()
+	{
+		List<Vector3> points = new();
+		foreach (LineRenderer line in linesToPoint)
+		{
+			Vector3[] positions = new Vector3[line.positionCount];
+			line.GetPositions(positions);
+			points.AddRange(positions);
+		}
+
+		return new(points.Distinct());
+	}
+
+	public Queue<Vector3> PathTo() => new(path);
+
+	public Queue<Vector3> PathFrom()
+	{
+		List<Vector3> copy = new(path);
+		copy.Reverse();
+		return new(copy);
 	}
 }

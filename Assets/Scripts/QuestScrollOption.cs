@@ -1,31 +1,71 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class QuestScrollOption : MonoBehaviour
 {
-	[SerializeField] Transform root;
+	[SerializeField] QuestScroll parent;
 	[SerializeField] TextMeshProUGUI descriptionText;
 	[SerializeField] TextMeshProUGUI knightTimeText;
 	[SerializeField] TextMeshProUGUI costsText;
 	[SerializeField] TextMeshProUGUI rewardsText;
+	[SerializeField] GameObject cross;
 
+	Button button;
 	QuestOption option;
+
+	private void Awake()
+	{
+		button = GetComponent<Button>();
+	}
+
 	public void SetValues(QuestOption option)
 	{
 		this.option = option;
 		if (option == null)
 		{
-			root.gameObject.SetActive(false);
+			gameObject.SetActive(false);
 			return;
 		}
 
-		root.gameObject.SetActive(true);
+		gameObject.SetActive(true);
 		descriptionText.text = option.description;
 		knightTimeText.text = $"<sprite=\"Knight\" index=0>{option.knights}  <sprite=\"Time\" index=0>{option.duration:F1}s";
-		costsText.text = "<font=\"EagleLake-Regular SDF\">Cost</font>\n" + ConcatResourceCosts(option.costs); 
-		rewardsText.text = "<font=\"EagleLake-Regular SDF\">Reward</font>\n" + ConcatResourceCosts(option.rewards); 
+		costsText.text = "<font=\"EagleLake-Regular SDF\">Cost</font>\n" + ConcatResourceCosts(option.costs);
+		rewardsText.text = "<font=\"EagleLake-Regular SDF\">Reward</font>\n" + ConcatResourceCosts(option.rewards);
+		bool canUse = EvaluatePossible();
+		button.interactable = canUse;
+		cross.SetActive(!canUse);
+	}
+
+	private bool EvaluatePossible()
+	{
+		if (GameManager.Instance.KnightManager.AvailableKnights < option.knights) return false;
+
+		foreach (ResourceCost cost in option.costs)
+		{
+			Debug.Log($"{cost.resource}");
+			Debug.Log($"Needs {cost.quantity}");
+			Debug.Log($"Has {GameManager.Instance.GetResourceQuantity(cost.resource)}");
+			if (GameManager.Instance.GetResourceQuantity(cost.resource) < -cost.quantity)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void Select()
+	{
+		// Immediately remove the resource
+		foreach (ResourceCost cost in option.costs)
+		{
+			GameManager.Instance.AddResource(cost);
+		}
+		parent.CloseScroll();
 	}
 
 	static string ConcatResourceCosts(List<ResourceCost> costs)

@@ -1,5 +1,4 @@
 using GameResources;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -9,12 +8,13 @@ public class GameManager : Singleton<GameManager>
 	public InputActions InputActions { get; private set; }
 	[field: SerializeField] public QuestScroll QuestScroll { get; private set; }
 	[field: SerializeField] public Fade Fade { get; private set; }
+	public KnightManager KnightManager { get; private set; }
 
-	private int gold = 0;
-	private int wood = 0;
-	private int medicine = 0;
-	private int food = 0;
-	private int people = 0;
+	[SerializeField] private int gold = 100;
+	[SerializeField] private int wood = 20;
+	[SerializeField] private int medicine = 20;
+	[SerializeField] private int food = 20;
+	[SerializeField] private int people = 0;
 
 	private bool isStorm;
 
@@ -30,6 +30,7 @@ public class GameManager : Singleton<GameManager>
 	[SerializeField] float stormQuestFrequencyModifier = 2;
 	float timer = 5;
 
+	readonly List<OptionTimer> timers = new();
 
 	protected override void Awake()
 	{
@@ -38,6 +39,8 @@ public class GameManager : Singleton<GameManager>
 		Debug.Log("Quest file found, reading.");
 		allQuests = ((QuestData)JsonUtility.FromJson(jsonRaw, typeof(QuestData))).quests;
 		Debug.Log($"Loaded {allQuests.Count} from file.");
+
+		KnightManager = gameObject.AddComponent<KnightManager>();
 
 		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
 
@@ -50,6 +53,16 @@ public class GameManager : Singleton<GameManager>
 	private void Update()
 	{
 		EventsUpdate();
+		foreach (OptionTimer timer in timers)
+		{
+			if (!timer.Tick(Time.deltaTime)) return;
+
+			foreach (ResourceCost cost in timer.GetCosts())
+			{
+				AddResource(cost);
+			}
+			timers.Remove(timer);
+		}
 	}
 
 	private void EventsUpdate()
@@ -112,5 +125,32 @@ public class GameManager : Singleton<GameManager>
 			default:
 				throw new System.NotImplementedException();
 		}
+	}
+
+	public void QuestOptionSelection(QuestOption selection, PointOfInterest location)
+	{
+		// Add timer for rewards
+		timers.Add(new(selection.rewards, selection.duration));
+		KnightManager.Dispatch(selection.knights, location, selection.duration);
+	}
+}
+
+[System.Serializable]
+class OptionTimer
+{
+	readonly List<ResourceCost> costList;
+	float timer;
+
+	public OptionTimer(List<ResourceCost> costList, float timer)
+	{
+		this.costList = costList;
+		this.timer = timer;
+	}
+	public List<ResourceCost> GetCosts() => costList;
+
+	public bool Tick(float time)
+	{
+		timer -= time;
+		return timer < 0;
 	}
 }

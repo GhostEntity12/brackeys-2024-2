@@ -10,6 +10,7 @@ public class QuestScroll : MonoBehaviour
 	[SerializeField] TextMeshProUGUI titleText;
 	[SerializeField] TextMeshProUGUI descriptionText;
 	[SerializeField] QuestScrollOption[] options;
+	[SerializeField] CanvasGroup group;
 	PointOfInterest eventLocation;
 
 	InputActions actions;
@@ -47,6 +48,7 @@ public class QuestScroll : MonoBehaviour
 		LeanTween.moveX(root, 0, 0.5f).setEaseInOutQuad().setDelay(0.45f);
 		actions.MainGameplay.Movement.Disable();
 		GameManager.Instance.Fade.FadeIn();
+		group.interactable = true;
 	}
 	public void CloseScroll()
 	{
@@ -55,6 +57,7 @@ public class QuestScroll : MonoBehaviour
 		LeanTween.moveX(root, 340, 0.5f).setEaseInOutQuad();
 		actions.MainGameplay.Movement.Enable();
 		GameManager.Instance.Fade.FadeOut();
+		group.interactable = false;
 	}
 }
 
