@@ -218,6 +218,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b6fa9fdf456bbd44baa433b83f3e08f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  questIDs: []
+  questIDs:
+  - calmRuinedTownExplore
+  - calmRuinedTownSupply
+  - calmRuinedTownPeople
+  - calmRuinedTownTrade
+  - stormRuinedTownBuildings
+  - stormRuinedTownSick
+  - stormRuinedTownInjured
   flag: {fileID: 831609426202390193}
   linesToPoint: []

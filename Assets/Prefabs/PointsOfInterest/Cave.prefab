@@ -218,6 +218,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b6fa9fdf456bbd44baa433b83f3e08f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  questIDs: []
+  questIDs:
+  - calmCaveExplore
+  - calmCaveDragonRumour
+  - calmCaveDragonSide
+  - stormCaveLostChild
+  - stormCaveDragonFood
+  - stormCaveDragonMed
+  - stormCaveLostFamily
   flag: {fileID: 8827218293675193605}
   linesToPoint: []
