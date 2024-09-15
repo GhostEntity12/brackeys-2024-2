@@ -221,7 +221,6 @@ MonoBehaviour:
   questIDs:
   - stormCastleEatenFood
   - stormCastleInjured
-  - stormCastleSick
   - stormCastleHouseDown
   - stormCastleWetWood
   flag: {fileID: 4593887042261662223}

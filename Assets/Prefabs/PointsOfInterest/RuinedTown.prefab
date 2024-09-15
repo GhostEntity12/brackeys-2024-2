@@ -221,9 +221,7 @@ MonoBehaviour:
   questIDs:
   - calmRuinedTownExplore
   - calmRuinedTownSupply
-  - calmRuinedTownPeople
   - calmRuinedTownTrade
-  - stormRuinedTownBuildings
   - stormRuinedTownSick
   - stormRuinedTownInjured
   flag: {fileID: 831609426202390193}

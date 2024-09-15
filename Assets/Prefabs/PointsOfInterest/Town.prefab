@@ -139,7 +139,6 @@ MonoBehaviour:
   - stormTownSupply
   - stormTownRuinedBuildings
   - stormTownInjured
-  - stormTownSick
   - stormTownExcessPeople
   flag: {fileID: 1729430475109859895}
   linesToPoint: []

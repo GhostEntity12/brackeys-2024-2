@@ -221,10 +221,5 @@ MonoBehaviour:
   questIDs:
   - calmCaveExplore
   - calmCaveDragonRumour
-  - calmCaveDragonSide
-  - stormCaveLostChild
-  - stormCaveDragonFood
-  - stormCaveDragonMed
-  - stormCaveLostFamily
   flag: {fileID: 8827218293675193605}
   linesToPoint: []

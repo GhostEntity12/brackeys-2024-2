@@ -220,11 +220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   questIDs:
   - calmForestExplore
-  - calmForestHut
-  - calmForestChop
-  - calmForestWitchHelp
   - stormForestDamage
-  - stormForestInjured
-  - stormForestFood
+  - calmForestChop
   flag: {fileID: 2433927887262167872}
   linesToPoint: []
