@@ -4713,8 +4713,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 062d4b363b2d63347bbf85b8288bfa76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <QuestScroll>k__BackingField: {fileID: 0}
+  <Fade>k__BackingField: {fileID: 0}
+  gold: 100
+  wood: 20
+  medicine: 20
+  food: 20
+  people: 0
   clock: {fileID: 0}
   pointsOfInterest: []
+  timerBounds: {x: 0, y: 0}
+  stormQuestFrequencyModifier: 2
 --- !u!1 &894553444
 GameObject:
   m_ObjectHideFlags: 0
@@ -13876,6 +13885,31 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7794094994879042660, guid: b4ecfe6830c75db43b2c2439718dfc68,
+        type: 3}
+      propertyPath: linesToPoint.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7794094994879042660, guid: b4ecfe6830c75db43b2c2439718dfc68,
+        type: 3}
+      propertyPath: linesToPoint.Array.data[0]
+      value: 
+      objectReference: {fileID: 251747196}
+    - target: {fileID: 7794094994879042660, guid: b4ecfe6830c75db43b2c2439718dfc68,
+        type: 3}
+      propertyPath: linesToPoint.Array.data[1]
+      value: 
+      objectReference: {fileID: 2124822558}
+    - target: {fileID: 7794094994879042660, guid: b4ecfe6830c75db43b2c2439718dfc68,
+        type: 3}
+      propertyPath: linesToPoint.Array.data[2]
+      value: 
+      objectReference: {fileID: 2101470045}
+    - target: {fileID: 7794094994879042660, guid: b4ecfe6830c75db43b2c2439718dfc68,
+        type: 3}
+      propertyPath: linesToPoint.Array.data[3]
+      value: 
+      objectReference: {fileID: 1285324555}
     - target: {fileID: 8039808085973670461, guid: b4ecfe6830c75db43b2c2439718dfc68,
         type: 3}
       propertyPath: m_LocalPosition.x

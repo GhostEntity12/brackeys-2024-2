@@ -134,7 +134,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b6fa9fdf456bbd44baa433b83f3e08f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  questIDs: []
+  questIDs:
+  - calmLakeFishing
+  - calmLakeMonster
+  - stormLakeLostPet
+  - stormLakeMissingChild
   flag: {fileID: 6610682597561123009}
   linesToPoint: []
 --- !u!1 &3475709429082389321

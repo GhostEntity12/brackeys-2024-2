@@ -134,7 +134,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b6fa9fdf456bbd44baa433b83f3e08f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  questIDs: []
+  questIDs:
+  - calmTownTrade
+  - stormTownSupply
+  - stormTownRuinedBuildings
+  - stormTownInjured
+  - stormTownSick
+  - stormTownExcessPeople
   flag: {fileID: 1729430475109859895}
   linesToPoint: []
 --- !u!1 &8063995139618401883
