@@ -20,8 +20,8 @@ public class GameManager : Singleton<GameManager>
 
 	private List<Quest> allQuests = new();
 
-	readonly string path = $"{Application.dataPath}/Resources/";
-	readonly string fileName = "quest.json";
+	//readonly string path = $"{Application.dataPath}/Resources/";
+	//readonly string fileName = "quest.json";
 
 	[SerializeField] Clock clock;
 	[SerializeField] PointOfInterest[] pointsOfInterest;
@@ -43,17 +43,19 @@ public class GameManager : Singleton<GameManager>
 		//Debug.Log("Quest file found, reading.");
 		//allQuests = ((QuestData)JsonUtility.FromJson(jsonRaw, typeof(QuestData))).quests;
 
-		KnightManager = gameObject.AddComponent<KnightManager>();
+		InputActions = new();
 
-		KnightManager.SetKnights(15);
-
+		KnightManager = GetComponent<KnightManager>();
 		pointsOfInterest = FindObjectsOfType<PointOfInterest>();
+	}
 
+	private void Start()
+	{
 		clock.OnStormStart += (_, _) => isStorm = true;
 		clock.OnStormEnd += (_, _) => isStorm = false;
-
-		InputActions = new();
+		KnightManager.SetKnights(15);
 	}
+
 
 	private void Update()
 	{

@@ -16,15 +16,17 @@ public class QuestScrollOption : MonoBehaviour
 
 	Button button;
 	QuestOption option;
+	PointOfInterest location;
 
 	private void Awake()
 	{
 		button = GetComponent<Button>();
 	}
 
-	public void SetValues(QuestOption option)
+	public void SetValues(QuestOption option, PointOfInterest location)
 	{
 		this.option = option;
+		this.location = location;
 		if (option == null)
 		{
 			gameObject.SetActive(false);
@@ -66,6 +68,7 @@ public class QuestScrollOption : MonoBehaviour
 			GameManager.Instance.AddResource(cost);
 		}
 		parent.CloseScroll();
+		GameManager.Instance.QuestOptionSelection(option, location);
 	}
 
 	static string ConcatResourceCosts(List<ResourceCost> costs)

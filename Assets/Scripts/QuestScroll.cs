@@ -33,7 +33,7 @@ public class QuestScroll : MonoBehaviour
 		{
 			if (i < quest.options.Count)
 			{
-				options[i].SetValues(quest.options[i]);
+				options[i].SetValues(quest.options[i], eventLocation);
 			}
 		}
 		eventLocation = location;

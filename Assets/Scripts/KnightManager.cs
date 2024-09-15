@@ -6,15 +6,9 @@ using UnityEngine;
 
 public class KnightManager : MonoBehaviour
 {
-	public int AvailableKnights { get; private set; }
-	[SerializeField] int totalKnights = 15;
-	Queue<Knight> knightQueue;
-	Knight template;
-
-	private void Start()
-	{
-		AvailableKnights = totalKnights;
-	}
+	[SerializeField] Knight template;
+	readonly Queue<Knight> knightQueue = new();
+	public int AvailableKnights => knightQueue.Count;
 
 	public void SetKnights(int count)
 	{

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,37 +13,22 @@ public class Knight : MonoBehaviour
         FromQuest
     }
 
-    bool doMovement;
-    bool activeQuest;
-    PointOfInterest questLocation;
     [SerializeField] float moveSpeed;
+
+    bool doMovement;
     float timeToDestination;
     float questTime = 0;
+    PointOfInterest questLocation;
+
     State currentState = State.Idle;
+    
     Queue<Vector3> path;
     Vector3 currentWaypoint;
 
     // Update is called once per frame
     void Update()
     {
-        // if can move
-        // if idle
-        // return
-
-        // if headed to quest
-        // tick timeToDestination
-        // move towards quest
-
-        // if at quest
-        // if remainingQuestTime < timeToDestination
-        // start walking to castle
-
-        // if returning
-        // move toward castle
-        if (doMovement && activeQuest)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, questLocation.Location, moveSpeed * Time.deltaTime);
-        }
+        if (!doMovement) return;
 
         switch (currentState)
         {
